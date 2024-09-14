@@ -22,6 +22,27 @@ def initLynx(Port):
 
 
 #Set Servo Positions
+def setServoPos(Positions):
+    
+    global ser
+    
+    
+    
+    baseCmd = '#0P%d\r' %(Positions[0])
+    shoulderCmd = '#1P%d\r' %(Positions[1])
+    elbowCmd = '#2P%d\r' %(Positions[2])
+    wristCmd = '#3P%d\r' %(Positions[3])
+    wristRotCmd = '#4P%d\r' %(Positions[4])
+    gripperCmd = '#5P%d\r' %(Positions[5])
+    
+    ser.write(baseCmd.encode('utf-8'))
+    ser.write(shoulderCmd.encode('utf-8'))
+    ser.write(elbowCmd.encode('utf-8'))
+    ser.write(wristCmd.encode('utf-8'))
+    ser.write(wristRotCmd.encode('utf-8'))
+    ser.write(gripperCmd.encode('utf-8'))
+
+        
     
     
 #Kinematic Calculations
@@ -32,14 +53,27 @@ def initLynx(Port):
     
 """Main Loop"""
 
+numOfPoints = 3
 
-ser = initLynx(COMPort)
+#Define Servo Positions
+servoPositions = [[1500,1500,1500,1500,1500,1500],
+                  [1000,1000,1000,1000,1000,1000],
+                  [2200,2200,2200,2200,2200,2200]]
 
-
-#Define Waypoints
+#Define Time Delays
+timeDelays = [2,2,2]
 
 
 #Run Functions
+ser = initLynx(COMPort)
+
+i = 0
+while (i <= numOfPoints-1):
+    setServoPos(servoPositions[i])
+    print('Moved to Position: %d' %(i))
+    time.sleep(timeDelays[i])
+    i = i + 1
+
 
 
 #Output Positions
