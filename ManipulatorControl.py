@@ -11,6 +11,16 @@ import matplotlib
 #Define Variables
 COMPort = 'COM3'
 
+#Servo ROMs
+# Base = 0-180 deg
+# Shoulder = 0-135 deg
+# Elbow = 0-135 deg
+# Wrist = 0-90 deg
+# Wrist Rotation (WristR) = 0-180 deg
+# Gripper = 0-90 deg
+
+#Angles defined along x axis.
+
 
 #Define Functions
 
@@ -22,18 +32,17 @@ def initLynx(Port):
 
 
 #Set Servo Positions
-def setServoPos(Positions):
+def setServoPos(Angles):
     
     global ser
     
-    
-    
-    baseCmd = '#0P%d\r' %(Positions[0])
-    shoulderCmd = '#1P%d\r' %(Positions[1])
-    elbowCmd = '#2P%d\r' %(Positions[2])
-    wristCmd = '#3P%d\r' %(Positions[3])
-    wristRotCmd = '#4P%d\r' %(Positions[4])
-    gripperCmd = '#5P%d\r' %(Positions[5])
+    #Convert angles to servo positions and then into serial commands
+    baseCmd = '#0P%d\r' %(Angles[0]*5 + 950)
+    shoulderCmd = '#1P%d\r' %(Angles[1]*-8.889 + 2000)
+    elbowCmd = '#2P%d\r' %(Angles[2]*8.889 + 700)
+    wristCmd = '#3P%d\r' %(Angles[3]*11.11 + 500)
+    wristRotCmd = '#4P%d\r' %(Angles[4]*20 + 1800)
+    gripperCmd = '#5P%d\r' %(Angles[5]*-14.4 -1300)
     
     ser.write(baseCmd.encode('utf-8'))
     ser.write(shoulderCmd.encode('utf-8'))
@@ -42,8 +51,6 @@ def setServoPos(Positions):
     ser.write(wristRotCmd.encode('utf-8'))
     ser.write(gripperCmd.encode('utf-8'))
 
-        
-    
     
 #Kinematic Calculations
     
@@ -53,15 +60,14 @@ def setServoPos(Positions):
     
 """Main Loop"""
 
-numOfPoints = 3
+numOfPoints = 2
 
 #Define Servo Positions
-servoPositions = [[1500,1500,1500,1500,1500,1500],
-                  [1000,1000,1000,1000,1000,1000],
-                  [2200,2200,2200,2200,2200,2200]]
+servoAngles = [[0,90,45,0,90,90],
+               [-90,0,135,90,0,0]]
 
 #Define Time Delays
-timeDelays = [2,2,2]
+timeDelays = [2,2,]
 
 
 #Run Functions
@@ -69,14 +75,11 @@ ser = initLynx(COMPort)
 
 i = 0
 while (i <= numOfPoints-1):
-    setServoPos(servoPositions[i])
-    print('Moved to Position: %d' %(i))
+    setServoPos(servoAngles[i])
+    print('servoAngles: %d' %(i))
     time.sleep(timeDelays[i])
     i = i + 1
 
-
-
-#Output Positions
 
 
 #Close the Program
