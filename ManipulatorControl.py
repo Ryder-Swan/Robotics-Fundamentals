@@ -6,6 +6,7 @@ import serial
 import numpy as np
 import time
 import matplotlib
+import math
 
 
 #Define Variables
@@ -53,7 +54,33 @@ def setServoPos(Angles):
 
     
 #Kinematic Calculations
+def fwdKinematicCalc(Angles):
     
+    #Define Link lengths
+    a0 = 2.718
+    a1 = 5.753
+    a2 = 7.375
+    a3 = 3.955
+    
+    #Define the rotation matrix for each joint
+    #A0 = #Base rotation matrix
+    
+    #A1 - Shoulder Matrix
+    A1 = [[math.cos(Angles[1]), -math.sin(Angles[1]), 0, a1*math.cos(Angles[1])],
+          [math.sin(Angles[1]),  math.cos(Angles[1]), 0, a1*math.sin(Angles[1])],
+          [0                  , 0                   , 1, 0                     ],
+          [0                  , 0                   , 0, 1                     ]]
+    
+    #A2 - Elbow Matrix
+    A2 = [[math.cos(Angles[2]), -math.sin(Angles[2]), 0, a2*math.cos(Angles[2])],
+          [math.sin(Angles[2]),  math.cos(Angles[2]), 0, a2*math.sin(Angles[2])],
+          [0                  , 0                   , 1, 0                     ],
+          [0                  , 0                   , 0, 1                     ]]
+    
+    #Transformation matrix from the origin to the hand
+    T0h = np.matmul(A1,A2)
+    
+    return T0h
     
 #Reverse Kinematic Calculations
     
@@ -67,7 +94,7 @@ servoAngles = [[0,90,45,0,90,90],
                [-90,0,135,90,0,0]]
 
 #Define Time Delays
-timeDelays = [2,2,]
+timeDelays = [2,2]
 
 
 #Run Functions
@@ -76,7 +103,9 @@ ser = initLynx(COMPort)
 i = 0
 while (i <= numOfPoints-1):
     setServoPos(servoAngles[i])
-    print('servoAngles: %d' %(i))
+    transformationMatrix = fwdKinematicCalc(servoAngles[i])
+    endPt = transformationMatrix*np.matrix('0;0;0;1')
+    
     time.sleep(timeDelays[i])
     i = i + 1
 
