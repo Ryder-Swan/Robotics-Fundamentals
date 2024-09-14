@@ -2,27 +2,38 @@
 
 
 #Import Statements
+import serial
+import numpy as np
+import time
+import matplotlib
 
 
 #Define Variables
+COMPort = 'COM3'
 
 
 #Define Functions
 
 
-    #Connect to lynx motion controller
+#Connect to lynx motion controller
+def initLynx(Port):
+    connection = serial.Serial(Port, 9600, timeout=0.5)
+    return connection        
 
 
-    #Set Servo Positions
+#Set Servo Positions
     
     
-    #Kinematic Calculations
+#Kinematic Calculations
     
     
-    #Reverse Kinematic Calculations
+#Reverse Kinematic Calculations
     
     
-#Main Loop
+"""Main Loop"""
+
+
+ser = initLynx(COMPort)
 
 
 #Define Waypoints
@@ -32,3 +43,7 @@
 
 
 #Output Positions
+
+
+#Close the Program
+ser.close()
